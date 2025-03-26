@@ -1,13 +1,10 @@
 services:
   mongodb:
     image: mongo:6.0.8
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 123456
     ports:
       - 27017:27017
     volumes:
-      - mongodb_data_container:/data/db
+      - mongodb_data_container1:/data/db
 
 volumes:
-  mongodb_data_container:
+  mongodb_data_container1:
