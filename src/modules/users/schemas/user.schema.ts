@@ -7,7 +7,7 @@ export type UserDocument = HydratedDocument<User>
 @Schema({ timestamps: true })
 export class User {
   @Prop()
-  username: string
+  name: string
 
   @Prop()
   email: string
@@ -15,7 +15,7 @@ export class User {
   @Prop()
   password: string
 
-  @Prop()
+  @Prop({ default: 'USER' })
   role: string
 
   @Prop()
@@ -24,17 +24,17 @@ export class User {
   @Prop()
   avatar: string
 
-  @Prop()
-  account_type: string
+  @Prop({ default: 'LOCAL' })
+  accountType: string
+
+  @Prop({ default: false })
+  isActive: boolean
 
   @Prop()
-  is_active: boolean
+  codeId: string
 
   @Prop()
-  code_id: string
-
-  @Prop()
-  code_expired_at: Date
+  codeExpiredAt: Date
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }] })
   books: Book[]

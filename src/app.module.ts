@@ -9,6 +9,9 @@ import { BooksModule } from './modules/books/books.module'
 import { BuyHistoriesModule } from './modules/buy.histories/buy.histories.module'
 import { ChaptersModule } from './modules/chapters/chapters.module'
 import { TranslatorGroupsModule } from './modules/translator.groups/translator.groups.module'
+import { AuthModule } from './auth/auth.module'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from '@/auth/passport/jwt-auth.guard'
 
 @Module({
   imports: [
@@ -27,8 +30,15 @@ import { TranslatorGroupsModule } from './modules/translator.groups/translator.g
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
