@@ -13,6 +13,9 @@ export class AuthService {
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(username)
+    if (!user) {
+      throw new UnauthorizedException("User not exist")
+    }
     const isValidPassword = await comparePasswordHelper(pass, user.password)
 
     if (!user || !isValidPassword) return null

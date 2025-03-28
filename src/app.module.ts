@@ -12,6 +12,7 @@ import { TranslatorGroupsModule } from './modules/translator.groups/translator.g
 import { AuthModule } from './auth/auth.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from '@/auth/passport/jwt-auth.guard'
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { JwtAuthGuard } from '@/auth/passport/jwt-auth.guard'
       inject: [ConfigService],
     }),
     AuthModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
