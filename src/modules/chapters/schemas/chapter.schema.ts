@@ -7,7 +7,7 @@ export type ChapterDocument = HydratedDocument<Chapter>
 @Schema({ timestamps: true })
 export class Chapter {
   @Prop()
-  chapter_title: string
+  chapteTitle: string
 
   @Prop()
   price: number

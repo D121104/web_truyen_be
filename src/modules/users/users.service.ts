@@ -10,6 +10,7 @@ import mongoose from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
 import { MailerService } from '@nestjs-modules/mailer'
+import { IUser } from '@/modules/users/users.interface'
 
 @Injectable()
 export class UsersService {
@@ -75,6 +76,11 @@ export class UsersService {
     return await this.userModel.findOne({ email })
   }
 
+  async findByRefreshToken(refreshToken: string) {
+    // Replace the following logic with your actual database query
+    return await this.userModel.findOne({ refreshToken })
+  }
+
   async update(updateUserDto: UpdateUserDto) {
     return await this.userModel.updateOne(
       { _id: updateUserDto._id },
@@ -114,7 +120,7 @@ export class UsersService {
     //send email
     this.mailerService.sendMail({
       to: user.email, // list of receivers
-      subject: 'Activate  your account', // Subject line
+      subject: 'Activate your account', // Subject line
       template: 'register',
       context: {
         name: user?.name ?? user.email,
@@ -126,5 +132,9 @@ export class UsersService {
     return {
       _id: user._id,
     }
+  }
+
+  updateUserToken = async (refreshToken: string, _id: string) => {
+    await this.userModel.updateOne({ _id }, { refreshToken })
   }
 }

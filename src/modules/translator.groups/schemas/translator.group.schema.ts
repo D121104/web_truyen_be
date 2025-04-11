@@ -8,16 +8,16 @@ export type TranslatorGroupDocument = HydratedDocument<TranslatorGroup>
 @Schema({ timestamps: true })
 export class TranslatorGroup {
   @Prop()
-  group_name: string
+  groupName: string
 
   @Prop()
-  group_description: string
+  groupDescription: string
 
   @Prop()
-  group_img_url: string
+  groupImgUrl: string
 
   @Prop()
-  group_status: string
+  groupStatus: string
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   users: User[]

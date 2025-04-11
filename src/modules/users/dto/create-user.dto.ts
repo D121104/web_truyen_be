@@ -13,6 +13,9 @@ export class CreateUserDto {
 
   coin: number
   avatar: string
+  accountType: string
+  isActive: boolean
+  refreshToken: string
   codeId: string
   codeExpiredAt: Date
   books: string[]

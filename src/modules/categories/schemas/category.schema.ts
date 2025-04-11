@@ -7,7 +7,7 @@ export type CategoryDocument = HydratedDocument<Category>
 @Schema({ timestamps: true })
 export class Category {
   @Prop()
-  Category_name: string
+  categoryName: string
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }] })
   books: Book[]

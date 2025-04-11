@@ -9,13 +9,13 @@ export type BookDocument = HydratedDocument<Book>
 @Schema({ timestamps: true })
 export class Book {
   @Prop()
-  book_title: string
+  bookTitle: string
 
   @Prop()
   description: string
 
   @Prop()
-  img_url: string
+  imgUrl: string
 
   @Prop()
   view: number

@@ -18,7 +18,7 @@ export class User {
   @Prop({ default: 'USER' })
   role: string
 
-  @Prop()
+  @Prop({ default: 0 })
   coin: number
 
   @Prop()
@@ -29,6 +29,9 @@ export class User {
 
   @Prop({ default: false })
   isActive: boolean
+
+  @Prop()
+  refreshToken: string
 
   @Prop()
   codeId: string
