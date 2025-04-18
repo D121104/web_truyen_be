@@ -27,7 +27,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly mailerService: MailerService
-  ) {}
+  ) { }
 
   @Post('login')
   @Public()
@@ -78,5 +78,29 @@ export class AuthController {
     }
 
     return this.authService.generateNewToken(refreshToken, res)
+  }
+
+  @Public()
+  @Post('logout')
+  handleLogout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('refresh_token')
+    res.clearCookie('userId')
+    return {
+      message: 'Logout successfully',
+    }
+  }
+
+  @Public()
+  @Post('active-email')
+  activeEmail(@Body() body: { _id: string; codeId: string }) {
+    const { _id, codeId } = body
+    return this.authService.activeEmail(_id, codeId)
+  }
+
+  @Public()
+  @Post('forgot-password')
+  forgotPassword(@Body() body) {
+    const { email } = body
+    return this.authService.forgotPassword(email)
   }
 }

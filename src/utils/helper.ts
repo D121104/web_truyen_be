@@ -22,3 +22,14 @@ export const comparePasswordHelper = async (
     throw new Error('Error in comparePassword')
   }
 }
+
+// export const comparePassword = async (
+//   password: string,
+//   newPassword: string) => {
+//   try {
+//     return await bcrypt.compare(password, newPassword)
+//   } catch (error) {
+//     console.log('Error in comparePassword: ', error)
+//     throw new Error('Error in comparePassword')
+//   }
+// }

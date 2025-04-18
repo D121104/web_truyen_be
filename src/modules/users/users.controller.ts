@@ -7,14 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  Req,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { ChangePasswordUserDto } from './dto/change-password-user.dto'
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -43,5 +45,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id)
+  }
+
+  @Post('change-password')
+  changePassword(@Body() body: ChangePasswordUserDto, @Req() req) {
+    return this.usersService.changePassword(req.user, body)
   }
 }

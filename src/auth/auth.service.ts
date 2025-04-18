@@ -18,7 +18,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private usersService: UsersService,
     private jwtService: JwtService
-  ) {}
+  ) { }
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(username)
@@ -44,10 +44,10 @@ export class AuthService {
   }
 
   async login(user: any, res: Response) {
+    console.log('user', user)
     const payload = { username: user.email, sub: user._id }
     const refreshToken = this.generateRefreshToken(payload)
     const { _id, name, email, role } = user
-
     await this.usersService.updateUserToken(refreshToken, _id)
 
     res.cookie('refresh_token', refreshToken, {
@@ -150,5 +150,36 @@ export class AuthService {
     } catch (err) {
       throw new BadRequestException('Invalid refresh token')
     }
+  }
+
+  async logout(userId: string, res: Response) {
+    {
+      await this.usersService.updateUserToken(null, userId)
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      })
+      res.clearCookie('userId')
+      return { message: 'Logout successfully' }
+    }
+  }
+
+  async activeEmail(userId, codeId) {
+    //check id
+    if (!userId) {
+      throw new BadRequestException('Invalid ID')
+    }
+
+    return await this.usersService.activeEmail(userId, codeId)
+  }
+
+  async forgotPassword(email: string) {
+    //check email
+    if (!email) {
+      throw new BadRequestException('Invalid email')
+    }
+
+    return await this.usersService.forgotPassword(email)
   }
 }

@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { User } from '@/modules/users/schemas/user.schema'
 import { Model } from 'mongoose'
 import { hashPasswordHelper } from '@/utils/helper'
+import bcrypt from 'bcryptjs'
 import aqp from 'api-query-params'
 import mongoose from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
@@ -18,7 +19,7 @@ export class UsersService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     private readonly mailerService: MailerService
-  ) {}
+  ) { }
 
   isEmailExist = async (email: string) => {
     const user = await this.userModel.exists({ email })
@@ -69,7 +70,12 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`
+    //check id
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid ID')
+    }
+
+    return this.userModel.findById(id).select('-password')
   }
 
   async findByEmail(email: string) {
@@ -136,5 +142,69 @@ export class UsersService {
 
   updateUserToken = async (refreshToken: string, _id: string) => {
     await this.userModel.updateOne({ _id }, { refreshToken })
+  }
+
+  async activeEmail(_id: string, codeId: string) {
+    const user = await this.userModel.findById(_id)
+    if (!user) {
+      throw new BadRequestException('User not found')
+    }
+
+    //check if codeId is valid
+    if (dayjs(user.codeExpiredAt).isBefore(dayjs())) {
+      throw new BadRequestException('Code expired')
+    }
+
+    await this.userModel.updateOne(
+      { codeId },
+      { isActive: true, codeId: null, codeExpiredAt: null }
+    )
+  }
+
+  async updateUserPassword(email: string, password: string) {
+    const user = this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User not found')
+    }
+    const hashedPassword = await hashPasswordHelper(password)
+    return await this.userModel.updateOne(
+      { email },
+      { password: hashedPassword }
+    )
+  }
+
+  async forgotPassword(email: string) {
+    const new_password = uuidv4()
+    this.updateUserPassword(email, new_password)
+    // this.mailerService.sendMail({
+    //   to: email, // list of receivers
+    //   subject: 'Reset Password', // Subject line
+    //   template: 'register',
+    //   context: {
+    //     newPassword: new_password,
+    //   },
+    // })
+    return {
+      message: 'Reset password successfully',
+    }
+  }
+
+  async changePassword(user: IUser, data) {
+    const { password, newPassword } = data
+    const userData = await this.userModel.findById(user._id)
+    console.log(userData)
+    const hashedPassword = await hashPasswordHelper(newPassword)
+    if (await bcrypt.compare(password, userData.password)) {
+      await this.userModel.updateOne(
+        { _id: user._id },
+        { password: hashedPassword }
+      )
+      return {
+        message: 'Change password successfully',
+      }
+    } else {
+      throw new BadRequestException('Password is incorrect')
+    }
+
   }
 }
