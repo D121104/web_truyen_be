@@ -16,11 +16,13 @@ import { UploadModule } from './modules/upload/upload.module'
 import { MailerModule } from '@nestjs-modules/mailer'
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
 import { join } from 'path'
+import { CategoriesModule } from '@/modules/categories/categories.module'
 @Module({
   imports: [
     UsersModule,
     BooksModule,
     BuyHistoriesModule,
+    CategoriesModule,
     ChaptersModule,
     TranslatorGroupsModule,
     ConfigModule.forRoot({

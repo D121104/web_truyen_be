@@ -1,18 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Book } from './schemas/book.schema';
-import mongoose, { Model } from 'mongoose';
-import aqp from 'api-query-params';
+import { BadRequestException, Injectable } from '@nestjs/common'
+import { CreateBookDto } from './dto/create-book.dto'
+import { UpdateBookDto } from './dto/update-book.dto'
+import { InjectModel } from '@nestjs/mongoose'
+import { Book } from './schemas/book.schema'
+import mongoose, { Model } from 'mongoose'
+import aqp from 'api-query-params'
 
 @Injectable()
 export class BooksService {
-
   constructor(
     @InjectModel(Book.name)
-    private bookModel: Model<Book>,
-  ) { }
+    private bookModel: Model<Book>
+  ) {}
 
   async create(createBookDto: CreateBookDto) {
     const book = await this.bookModel.create({
@@ -20,9 +19,7 @@ export class BooksService {
     })
     return {
       _id: book._id,
-    };
-
-
+    }
   }
 
   async findAll(query: string, current: number, pageSize: number) {
@@ -47,8 +44,7 @@ export class BooksService {
     return { books, totalPages }
   }
 
-
-  findOne(id: string) {
+  async findOne(id: string) {
     //check id
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid ID')
@@ -60,7 +56,8 @@ export class BooksService {
   async update(updateBookDto: UpdateBookDto) {
     return await this.bookModel.updateOne(
       { _id: updateBookDto._id },
-      updateBookDto)
+      updateBookDto
+    )
   }
 
   async remove(id: string) {
