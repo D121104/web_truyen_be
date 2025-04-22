@@ -1,13 +1,12 @@
-import { IsEmail, IsNotEmpty } from 'class-validator'
+import { IsNotEmpty } from 'class-validator'
 
 export class CreateBookDto {
-    @IsNotEmpty()
-    bookTitle: string
+  @IsNotEmpty()
+  bookTitle: string
 
-    @IsNotEmpty()
-    description: string
+  @IsNotEmpty()
+  description: string
 
-    @IsNotEmpty()
-    imgUrl: string
-
+  @IsNotEmpty()
+  imgUrl: string
 }
