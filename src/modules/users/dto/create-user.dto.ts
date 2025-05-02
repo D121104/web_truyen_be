@@ -19,4 +19,5 @@ export class CreateUserDto {
   codeId: string
   codeExpiredAt: Date
   books: string[]
+  role: string
 }

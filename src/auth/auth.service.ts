@@ -4,13 +4,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { UsersService } from '@/modules/users/users.service'
-import { comparePasswordHelper } from '@/utils/helper'
+import { comparePasswordHelper, hashPasswordHelper } from '@/utils/helper'
 import { JwtService } from '@nestjs/jwt'
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto'
 import { IUser } from '@/modules/users/users.interface'
 import { ConfigService } from '@nestjs/config'
 import ms, { StringValue } from 'ms'
 import { Response } from 'express'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private usersService: UsersService,
     private jwtService: JwtService
-  ) { }
+  ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(username)
@@ -44,8 +45,12 @@ export class AuthService {
   }
 
   async login(user: any, res: Response) {
-    console.log('user', user)
-    const payload = { username: user.email, sub: user._id }
+    const payload = {
+      email: user.email,
+      sub: user._id,
+      role: user.role,
+      name: user.name,
+    }
     const refreshToken = this.generateRefreshToken(payload)
     const { _id, name, email, role } = user
     await this.usersService.updateUserToken(refreshToken, _id)
@@ -56,10 +61,7 @@ export class AuthService {
         ms(this.configService.get<StringValue>('JWT_REFRESH_EXPIRES_IN')) *
         1000,
       sameSite: 'none',
-      secure: true,
     })
-
-    res.cookie('userId', _id)
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -68,6 +70,72 @@ export class AuthService {
         name,
         role,
       },
+    }
+  }
+
+  async googleLogin(req: any, res: Response) {
+    const { user } = req
+
+    const isExistEmail = await this.usersService.findByEmail(user.email)
+    let currentUser: any
+    const newPassword = uuidv4()
+
+    const hashedPassword = await hashPasswordHelper(newPassword)
+
+    if (!isExistEmail) {
+      currentUser = await this.usersService.create({
+        email: user.email,
+        name: user.firstName + ' ' + user.lastName,
+        role: 'USER',
+        password: hashedPassword,
+        coin: 0,
+        avatar: '',
+        accountType: 'LOCAL',
+        isActive: true,
+        refreshToken: null,
+        codeId: null,
+        codeExpiredAt: null,
+        books: [],
+      })
+    } else {
+      const userName = user.firstName + ' ' + user.lastName
+      await this.usersService.updateUserName(user.email, userName)
+
+      currentUser = {
+        email: isExistEmail.email,
+        _id: isExistEmail._id,
+        role: isExistEmail.role,
+        name: user.firstName + ' ' + user.lastName,
+      }
+    }
+    console.log('currentUser', currentUser)
+
+    const refreshToken = this.generateRefreshToken(currentUser)
+    const accessToken = this.jwtService.sign(currentUser, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn:
+        ms(
+          this.configService.get<string>(
+            'JWT_ACCESS_TOKEN_EXPIRED'
+          ) as StringValue
+        ) / 1000,
+    })
+    console.log('accessToken', accessToken)
+    await this.usersService.updateUserToken(refreshToken, currentUser._id)
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      maxAge:
+        ms(
+          this.configService.get<string>(
+            'JWT_REFRESH_EXPIRES_IN'
+          ) as StringValue
+        ) * 1000,
+      sameSite: 'none',
+      secure: true,
+    })
+
+    return {
+      access_token: accessToken,
     }
   }
 
@@ -82,6 +150,7 @@ export class AuthService {
       codeId: null,
       codeExpiredAt: null,
       books: [],
+      role: 'USER',
     }
     return await this.usersService.handleRegister(userDto)
   }
@@ -111,8 +180,10 @@ export class AuthService {
 
       // Create a new payload for the tokens
       const newPayload = {
-        username: user.email,
+        email: user.email,
         sub: user._id,
+        role: user.role,
+        name: user.name,
       }
 
       // Generate a new refresh token

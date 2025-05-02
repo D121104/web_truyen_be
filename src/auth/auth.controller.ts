@@ -11,6 +11,7 @@ import {
   Res,
   Req,
   BadRequestException,
+  Logger,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { CreateAuthDto } from './dto/create-auth.dto'
@@ -27,7 +28,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly mailerService: MailerService
-  ) { }
+  ) {}
 
   @Post('login')
   @Public()
@@ -39,13 +40,35 @@ export class AuthController {
   // @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user
+    return {
+      user: req.user,
+    }
   }
 
   @Post('register')
   @Public()
   register(@Body() registerDto: CreateAuthDto) {
     return this.authService.handleRegister(registerDto)
+  }
+
+  @Public()
+  @Get('/google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {
+    Logger.log('googleAuth')
+  }
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(
+    @Req() req,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const result = await this.authService.googleLogin(req, res)
+    res.redirect(
+      `http://localhost:3000/auth/google?token=${result.access_token}`
+    )
   }
 
   // @Get('mail')
@@ -67,6 +90,7 @@ export class AuthController {
   //   return 'ok'
   // }
 
+  @Public()
   @Get('/refresh')
   handleRefresh(
     @Req() req: ExpressRequest,

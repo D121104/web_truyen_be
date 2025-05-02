@@ -19,7 +19,7 @@ export class UsersService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     private readonly mailerService: MailerService
-  ) { }
+  ) {}
 
   isEmailExist = async (email: string) => {
     const user = await this.userModel.exists({ email })
@@ -44,6 +44,19 @@ export class UsersService {
     return {
       _id: user._id,
     }
+  }
+
+  async updateUserName(email: string, name: string) {
+    return await this.userModel.updateOne(
+      {
+        email: email,
+      },
+      {
+        $set: {
+          name: name,
+        },
+      }
+    )
   }
 
   async findAll(query: string, current: number, pageSize: number) {
@@ -162,7 +175,7 @@ export class UsersService {
   }
 
   async updateUserPassword(email: string, password: string) {
-    const user = this.findByEmail(email);
+    const user = this.findByEmail(email)
     if (!user) {
       throw new BadRequestException('User not found')
     }
@@ -205,6 +218,5 @@ export class UsersService {
     } else {
       throw new BadRequestException('Password is incorrect')
     }
-
   }
 }
