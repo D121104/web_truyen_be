@@ -58,9 +58,13 @@ export class AuthService {
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       maxAge:
-        ms(this.configService.get<StringValue>('JWT_REFRESH_EXPIRES_IN')) *
-        1000,
+        ms(
+          this.configService.get<string>(
+            'JWT_REFRESH_EXPIRES_IN'
+          ) as StringValue
+        ) * 1000,
       sameSite: 'none',
+      secure: true,
     })
     return {
       access_token: this.jwtService.sign(payload),
@@ -108,7 +112,6 @@ export class AuthService {
         name: user.firstName + ' ' + user.lastName,
       }
     }
-    console.log('currentUser', currentUser)
 
     const refreshToken = this.generateRefreshToken(currentUser)
     const accessToken = this.jwtService.sign(currentUser, {
@@ -120,7 +123,7 @@ export class AuthService {
           ) as StringValue
         ) / 1000,
     })
-    console.log('accessToken', accessToken)
+
     await this.usersService.updateUserToken(refreshToken, currentUser._id)
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
@@ -145,7 +148,7 @@ export class AuthService {
       coin: 0,
       avatar: '',
       accountType: 'LOCAL',
-      isActive: false,
+      isActive: true,
       refreshToken: null,
       codeId: null,
       codeExpiredAt: null,

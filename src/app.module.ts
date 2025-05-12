@@ -18,6 +18,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path'
 import { CategoriesModule } from '@/modules/categories/categories.module'
 import { CommentsModule } from './modules/comments/comments.module'
+import { OtpsModule } from './modules/otps/otps.module'
 @Module({
   imports: [
     UsersModule,
@@ -39,6 +40,7 @@ import { CommentsModule } from './modules/comments/comments.module'
     AuthModule,
     CommentsModule,
     UploadModule,
+    OtpsModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

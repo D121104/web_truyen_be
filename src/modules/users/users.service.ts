@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { InjectModel } from '@nestjs/mongoose'
@@ -12,10 +17,14 @@ import { v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
 import { MailerService } from '@nestjs-modules/mailer'
 import { IUser } from '@/modules/users/users.interface'
+import { OtpsService } from '../otps/otps.service'
 
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(forwardRef(() => OtpsService))
+    private readonly otpService: OtpsService,
+
     @InjectModel(User.name)
     private userModel: Model<User>,
     private readonly mailerService: MailerService
@@ -131,20 +140,9 @@ export class UsersService {
     const user = await this.userModel.create({
       ...registerDto,
       password: hashedPassword,
-      isActive: false,
+      isActive: true,
       codeId: codeId,
       codeExpiredAt: dayjs().add(1, 'minute'),
-    })
-
-    //send email
-    this.mailerService.sendMail({
-      to: user.email, // list of receivers
-      subject: 'Activate your account', // Subject line
-      template: 'register',
-      context: {
-        name: user?.name ?? user.email,
-        activationCode: user.codeId,
-      },
     })
 
     //return response
@@ -186,20 +184,36 @@ export class UsersService {
     )
   }
 
-  async forgotPassword(email: string) {
-    const new_password = uuidv4()
-    this.updateUserPassword(email, new_password)
-    // this.mailerService.sendMail({
-    //   to: email, // list of receivers
-    //   subject: 'Reset Password', // Subject line
-    //   template: 'register',
-    //   context: {
-    //     newPassword: new_password,
-    //   },
-    // })
-    return {
-      message: 'Reset password successfully',
+  async forgotPassword(token: string) {
+    const user = await this.otpService.checkToken(token)
+
+    if (!user) {
+      throw new BadRequestException('Token not found!')
     }
+
+    const existUser = await this.findByEmail(user.email)
+    if (!existUser) {
+      throw new BadRequestException('User not found!')
+    }
+
+    const newPassword = uuidv4()
+
+    const passwordHash = await hashPasswordHelper(newPassword)
+    await this.userModel.updateOne(
+      { email: user.email },
+      { password: passwordHash }
+    )
+    await this.otpService.remove(token)
+    await this.mailerService.sendMail({
+      to: user.email,
+      from: 'Book Store',
+      subject: 'Mật khẩu mới của bạn',
+      template: 'reset-password.template.hbs',
+      context: {
+        password: newPassword,
+      },
+    })
+    return true
   }
 
   async changePassword(user: IUser, data) {
