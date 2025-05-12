@@ -17,6 +17,7 @@ import { MailerModule } from '@nestjs-modules/mailer'
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
 import { join } from 'path'
 import { CategoriesModule } from '@/modules/categories/categories.module'
+import { CommentsModule } from './modules/comments/comments.module'
 @Module({
   imports: [
     UsersModule,
@@ -36,6 +37,7 @@ import { CategoriesModule } from '@/modules/categories/categories.module'
       inject: [ConfigService],
     }),
     AuthModule,
+    CommentsModule,
     UploadModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
