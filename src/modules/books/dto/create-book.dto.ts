@@ -9,4 +9,7 @@ export class CreateBookDto {
 
   @IsNotEmpty()
   imgUrl: string
+
+  @IsNotEmpty()
+  author: string
 }
