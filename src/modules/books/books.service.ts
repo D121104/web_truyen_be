@@ -41,7 +41,17 @@ export class BooksService {
       .limit(pageSize)
       .sort(sort as any)
 
-    return { books, totalPages }
+    const res = {
+      meta: {
+        current: current,
+        pageSize: pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result: books,
+    }
+
+    return res
   }
 
   async findOne(id: string) {

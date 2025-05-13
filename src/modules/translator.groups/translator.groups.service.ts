@@ -18,11 +18,14 @@ export class TranslatorGroupsService {
       createTranslatorGroupDto.groupName
     )
     if (isGroupNameExist) {
-      throw new Error('Group name already exist')
+      throw new BadRequestException(
+        'Translator group name already exists. Please choose another name.'
+      )
     }
 
     const translatorGroup = this.TranslatorGroupModel.create({
       ...createTranslatorGroupDto,
+      groupStatus: 'inactive',
     })
     return translatorGroup
   }
@@ -45,7 +48,17 @@ export class TranslatorGroupsService {
       .limit(pageSize)
       .sort(sort as any)
 
-    return { translatorGroups, totalPages }
+    const res = {
+      meta: {
+        current: current,
+        pageSize: pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result: translatorGroups,
+    }
+
+    return res
   }
 
   async findOne(id: number) {

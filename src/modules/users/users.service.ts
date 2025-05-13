@@ -88,7 +88,17 @@ export class UsersService {
       .select('-password')
       .sort(sort as any)
 
-    return { users, totalPages }
+    const res = {
+      meta: {
+        current: current,
+        pageSize: pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result: users,
+    }
+
+    return res
   }
 
   findOne(id: number) {
