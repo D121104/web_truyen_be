@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { TranslatorGroup } from '@/modules/translator.groups/schemas/translator.group.schema'
 import mongoose, { Model } from 'mongoose'
 import aqp from 'api-query-params'
+import { IUser } from '../users/users.interface'
 
 @Injectable()
 export class TranslatorGroupsService {
@@ -13,7 +14,10 @@ export class TranslatorGroupsService {
     private TranslatorGroupModel: Model<TranslatorGroup>
   ) {}
 
-  async create(createTranslatorGroupDto: CreateTranslatorGroupDto) {
+  async create(
+    createTranslatorGroupDto: CreateTranslatorGroupDto,
+    user: IUser
+  ) {
     const isGroupNameExist = await this.isExistTranslatorGroup(
       createTranslatorGroupDto.groupName
     )
@@ -26,6 +30,8 @@ export class TranslatorGroupsService {
     const translatorGroup = this.TranslatorGroupModel.create({
       ...createTranslatorGroupDto,
       groupStatus: 'inactive',
+      owner: user._id,
+      users: [user._id],
     })
     return translatorGroup
   }
@@ -56,6 +62,45 @@ export class TranslatorGroupsService {
         total: totalItems,
       },
       result: translatorGroups,
+    }
+
+    return res
+  }
+
+  async findByUser(
+    query: string,
+    current: number,
+    pageSize: number,
+    userId: string
+  ) {
+    const { filter, sort } = aqp(query)
+    if (filter.current) delete filter.current
+    if (filter.pageSize) delete filter.pageSize
+
+    if (!current) current = 1
+    if (!pageSize) pageSize = 10
+
+    filter.users = userId
+
+    const totalItems = (await this.TranslatorGroupModel.find(filter)).length
+    const totalPages = Math.ceil(totalItems / pageSize)
+
+    const skip = (current - 1) * pageSize
+
+    const groups = await this.TranslatorGroupModel.find({
+      users: userId,
+    })
+      .limit(pageSize)
+      .skip(skip)
+
+    const res = {
+      meta: {
+        current: current,
+        pageSize: pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result: groups,
     }
 
     return res

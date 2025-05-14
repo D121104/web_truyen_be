@@ -16,10 +16,16 @@ export class TranslatorGroup {
   @Prop()
   groupImgUrl: string
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true })
+  owner: User
+
   @Prop()
   groupStatus: string
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    index: true,
+  })
   users: User[]
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book' })

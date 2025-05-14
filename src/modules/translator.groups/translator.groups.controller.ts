@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Request,
 } from '@nestjs/common'
 import { TranslatorGroupsService } from './translator.groups.service'
 import { CreateTranslatorGroupDto } from './dto/create-translator.group.dto'
@@ -19,10 +20,15 @@ export class TranslatorGroupsController {
     private readonly translatorGroupsService: TranslatorGroupsService
   ) {}
 
-  @Public()
   @Post()
-  create(@Body() createTranslatorGroupDto: CreateTranslatorGroupDto) {
-    return this.translatorGroupsService.create(createTranslatorGroupDto)
+  create(
+    @Body() createTranslatorGroupDto: CreateTranslatorGroupDto,
+    @Request() req: any
+  ) {
+    return this.translatorGroupsService.create(
+      createTranslatorGroupDto,
+      req.user
+    )
   }
 
   @Public()
@@ -39,6 +45,21 @@ export class TranslatorGroupsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.translatorGroupsService.findOne(+id)
+  }
+
+  @Get('/groups/by-user')
+  async findByUser(
+    @Query() query: string,
+    @Query('current') current: string,
+    @Query('pageSize') pageSize: string,
+    @Request() req: any
+  ) {
+    return await this.translatorGroupsService.findByUser(
+      query,
+      +current,
+      +pageSize,
+      req.user._id
+    )
   }
 
   @Public()

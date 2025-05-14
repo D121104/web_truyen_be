@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator'
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -19,5 +19,7 @@ export class CreateUserDto {
   codeId: string
   codeExpiredAt: Date
   books: string[]
+
+  @IsOptional()
   role: string
 }
