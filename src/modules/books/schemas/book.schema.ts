@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose'
 import { Category } from '@/modules/categories/schemas/category.schema'
 import { Chapter } from '@/modules/chapters/schemas/chapter.schema'
 import { User } from '@/modules/users/schemas/user.schema'
+import { TranslatorGroup } from '@/modules/translator.groups/schemas/translator.group.schema'
 
 export type BookDocument = HydratedDocument<Book>
 
@@ -26,6 +27,9 @@ export class Book {
   @Prop()
   status: string
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' })
+  comments: Comment[]
+
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }] })
   categories: Category[]
 
@@ -34,6 +38,9 @@ export class Book {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   users: User[]
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TranslatorGroup' })
+  translatorGroup: TranslatorGroup
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book)

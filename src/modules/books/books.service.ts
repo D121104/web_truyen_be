@@ -46,6 +46,21 @@ export class BooksService {
       .skip(skip)
       .limit(pageSize)
       .sort(sort as any)
+      .populate({
+        path: 'chapters',
+        select: {
+          _id: 1,
+          chapterNumber: 1,
+          chapterTitle: 1,
+          price: 1,
+          status: 1,
+          updatedAt: 1,
+        },
+        options: {
+          sort: { chapterNumber: -1 },
+          limit: 3,
+        },
+      })
 
     const res = {
       meta: {
@@ -66,7 +81,17 @@ export class BooksService {
       throw new BadRequestException('Invalid ID')
     }
 
-    return this.bookModel.findById(id)
+    return await this.bookModel.findById(id).populate({
+      path: 'chapters',
+      select: {
+        _id: 1,
+        chapterNumber: 1,
+        chapterTitle: 1,
+        price: 1,
+        status: 1,
+        updatedAt: 1,
+      },
+    })
   }
 
   async update(updateBookDto: UpdateBookDto) {
