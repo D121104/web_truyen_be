@@ -106,8 +106,40 @@ export class TranslatorGroupsService {
     return res
   }
 
-  async findOne(id: number) {
-    return `This action returns a #${id} translatorGroup`
+  async findByGroupId(groupId: string) {
+    // Kiểm tra tính hợp lệ của groupId
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      throw new BadRequestException('Invalid groupId')
+    }
+
+    // Tìm nhóm dịch theo groupId
+    const group = await this.TranslatorGroupModel.findOne({
+      _id: groupId,
+    }).exec()
+
+    // Nếu không tìm thấy, trả về lỗi
+    if (!group) {
+      throw new BadRequestException('Translator group not found')
+    }
+
+    return group
+  }
+
+  async findOne(id: string) {
+    // Kiểm tra tính hợp lệ của id
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid ID')
+    }
+
+    // Tìm nhóm dịch theo id
+    const group = await this.TranslatorGroupModel.findOne({ _id: id }).exec()
+
+    // Nếu không tìm thấy, trả về lỗi
+    if (!group) {
+      throw new BadRequestException('Translator group not found')
+    }
+
+    return group
   }
 
   async update(updateTranslatorGroupDto: UpdateTranslatorGroupDto) {

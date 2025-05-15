@@ -1,16 +1,22 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { CreateBookDto } from './dto/create-book.dto'
 import { UpdateBookDto } from './dto/update-book.dto'
 import { InjectModel } from '@nestjs/mongoose'
 import { Book } from './schemas/book.schema'
 import mongoose, { Model } from 'mongoose'
 import aqp from 'api-query-params'
+import { TranslatorGroupsService } from '@/modules/translator.groups/translator.groups.service'
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectModel(Book.name)
-    private bookModel: Model<Book>
+    private bookModel: Model<Book>,
+    private readonly translatorGroupsService: TranslatorGroupsService // Đảm bảo TranslatorGroupsService được inject
   ) {}
 
   async create(createBookDto: CreateBookDto) {
@@ -77,5 +83,19 @@ export class BooksService {
     }
 
     return this.bookModel.deleteOne({ _id: id })
+  }
+
+  async addBookToGroup(groupId: string, book: any) {
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      throw new BadRequestException('Invalid groupId')
+    }
+
+    const group = await this.translatorGroupsService.findByGroupId(groupId)
+    if (!group) {
+      throw new NotFoundException('Group not found')
+    }
+
+    group.books.push(book)
+    await group.save()
   }
 }

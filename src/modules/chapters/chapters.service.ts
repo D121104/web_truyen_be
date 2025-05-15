@@ -51,8 +51,21 @@ export class ChaptersService {
     return res
   }
 
-  async findOne(id: number) {
-    return `This action returns a #${id} chapter`
+  async findOne(id: string) {
+    // Kiểm tra tính hợp lệ của ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid chapter ID')
+    }
+
+    // Tìm chương trong cơ sở dữ liệu
+    const chapter = await this.chapterModel.findById(id)
+
+    // Nếu không tìm thấy chương, ném lỗi
+    if (!chapter) {
+      throw new BadRequestException('Chapter not found')
+    }
+
+    return chapter
   }
 
   async update(updateChapterDto: UpdateChapterDto) {

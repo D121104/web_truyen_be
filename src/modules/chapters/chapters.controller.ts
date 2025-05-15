@@ -12,6 +12,7 @@ import { ChaptersService } from './chapters.service'
 import { CreateChapterDto } from './dto/create-chapter.dto'
 import { UpdateChapterDto } from './dto/update-chapter.dto'
 import { Public } from '@/decorator/customize'
+import { GetChaptersDetailsDto } from '@/modules/chapters/dto/get-chapter-detail.dto'
 
 @Controller('chapters')
 export class ChaptersController {
@@ -33,9 +34,10 @@ export class ChaptersController {
     return this.chaptersService.findAll(query, +current, +pageSize)
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.chaptersService.findOne(+id)
+    return this.chaptersService.findOne(id)
   }
 
   @Public()

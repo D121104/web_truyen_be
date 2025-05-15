@@ -28,7 +28,11 @@ export class TranslatorGroup {
   })
   users: User[]
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book' })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
+    default: [],
+    index: true,
+  })
   books: Book[]
 }
 

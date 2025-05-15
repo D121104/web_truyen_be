@@ -41,12 +41,6 @@ export class TranslatorGroupsController {
     return this.translatorGroupsService.findAll(query, +current, +pageSize)
   }
 
-  @Public()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.translatorGroupsService.findOne(+id)
-  }
-
   @Get('/groups/by-user')
   async findByUser(
     @Query() query: string,
@@ -60,6 +54,12 @@ export class TranslatorGroupsController {
       +pageSize,
       req.user._id
     )
+  }
+
+  @Public()
+  @Get('/group/:groupId')
+  async findByGroupId(@Param('groupId') groupId: string) {
+    return await this.translatorGroupsService.findByGroupId(groupId)
   }
 
   @Public()

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  BadRequestException,
 } from '@nestjs/common'
 import { BooksService } from './books.service'
 import { CreateBookDto } from './dto/create-book.dto'
@@ -19,8 +20,21 @@ export class BooksController {
 
   @Public()
   @Post()
-  create(@Body() createBookDto: CreateBookDto) {
-    return this.booksService.create(createBookDto)
+  async create(
+    @Body() createBookDto: CreateBookDto,
+    @Query('groupId') groupId: string
+  ) {
+    if (!groupId) {
+      throw new BadRequestException('groupId is required')
+    }
+
+    // Tạo sách mới
+    const book = await this.booksService.create(createBookDto)
+
+    // Thêm sách vào nhóm
+    await this.booksService.addBookToGroup(groupId, book)
+
+    return book
   }
 
   @Public()

@@ -9,6 +9,9 @@ export class UpdateChapterDto extends PartialType(CreateChapterDto) {
   _id: string
 
   @IsOptional()
+  chapterNumber: string
+
+  @IsOptional()
   chapterTitle: string
 
   @IsOptional()
