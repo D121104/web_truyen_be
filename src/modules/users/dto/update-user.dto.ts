@@ -21,5 +21,8 @@ export class UpdateUserDto {
   books: string[]
 
   @IsOptional()
+  chapters: string[]
+
+  @IsOptional()
   role: string
 }

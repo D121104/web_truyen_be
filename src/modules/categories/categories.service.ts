@@ -49,7 +49,16 @@ export class CategoriesService {
       .limit(pageSize)
       .sort(sort as any)
 
-    return { categories, totalPages }
+    const res = {
+      meta: {
+        current: current,
+        pageSize: pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result: categories,
+    }
+    return res
   }
 
   async findOne(id: string) {

@@ -243,4 +243,20 @@ export class UsersService {
       throw new BadRequestException('Password is incorrect')
     }
   }
+
+  async unfollowBook(userId: string, bookId: string) {
+    return await this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { books: bookId } },
+      { new: true }
+    )
+  }
+
+  async followBook(userId: string, bookId: string) {
+    return await this.userModel.findByIdAndUpdate(
+      userId,
+      { $addToSet: { books: bookId } }, // $addToSet để không bị trùng
+      { new: true }
+    )
+  }
 }

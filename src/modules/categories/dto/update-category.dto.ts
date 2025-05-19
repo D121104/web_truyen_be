@@ -12,5 +12,8 @@ export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {
   categoryName: string
 
   @IsOptional()
+  description: string
+
+  @IsOptional()
   books: Book[]
 }

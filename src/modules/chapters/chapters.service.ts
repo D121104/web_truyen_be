@@ -5,18 +5,29 @@ import { Chapter } from '@/modules/chapters/schemas/chapter.schema'
 import mongoose, { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import aqp from 'api-query-params'
+import { Book } from '@/modules/books/schemas/book.schema'
 
 @Injectable()
 export class ChaptersService {
   constructor(
     @InjectModel(Chapter.name)
-    private chapterModel: Model<Chapter>
+    private chapterModel: Model<Chapter>,
+    @InjectModel(Book.name) // <-- Thêm dòng này
+    private readonly bookModel: Model<Book>
   ) {}
 
-  async create(createChapterDto: CreateChapterDto) {
-    const chapter = this.chapterModel.create({
+  async create(createChapterDto: CreateChapterDto, bookId: string) {
+    const chapter = await this.chapterModel.create({
       ...createChapterDto,
     })
+
+    // Sau khi tạo chương, cập nhật book để thêm chương mới vào mảng chapters
+    if (bookId) {
+      await this.bookModel.findByIdAndUpdate(bookId, {
+        $push: { chapters: chapter._id },
+      })
+    }
+
     return chapter
   }
 
@@ -28,7 +39,7 @@ export class ChaptersService {
     if (!current) current = 1
     if (!pageSize) pageSize = 10
 
-    const totalItems = (await this.chapterModel.find(filter)).length
+    const totalItems = await this.chapterModel.countDocuments(filter)
     const totalPages = Math.ceil(totalItems / pageSize)
 
     const skip = (current - 1) * pageSize
@@ -69,17 +80,69 @@ export class ChaptersService {
   }
 
   async update(updateChapterDto: UpdateChapterDto) {
-    return await this.chapterModel.updateOne(
-      { _id: updateChapterDto._id },
-      updateChapterDto
-    )
-  }
-  async remove(id: string) {
-    //check id
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('Invalid ID')
+    const { _id, createdAt, updatedAt, ...updateData } = updateChapterDto
+
+    // Nếu có cập nhật views, cập nhật viewsHistory
+    if (typeof updateData.views === 'number') {
+      const chapter = await this.chapterModel.findById(_id)
+      if (chapter) {
+        // Gán trực tiếp tổng views mới
+        chapter.views = updateData.views
+
+        // Xử lý viewsHistory
+        const today = new Date()
+        const todayStr = today.toISOString().slice(0, 10)
+        let found = false
+        if (!Array.isArray(chapter.viewsHistory)) chapter.viewsHistory = []
+        for (const v of chapter.viewsHistory) {
+          if (v.date && v.date.toISOString().slice(0, 10) === todayStr) {
+            v.views += 1
+            found = true
+            break
+          }
+        }
+        if (!found) {
+          chapter.viewsHistory.push({ date: today, views: 1 })
+        }
+
+        // Cập nhật các trường khác nếu có
+        Object.assign(chapter, updateData, {
+          views: chapter.views,
+          viewsHistory: chapter.viewsHistory,
+        })
+
+        // Update trực tiếp để tránh VersionError
+        return await this.chapterModel.updateOne(
+          { _id },
+          {
+            $set: {
+              ...updateData,
+              views: chapter.views,
+              viewsHistory: chapter.viewsHistory,
+            },
+          }
+        )
+      }
     }
 
-    return this.chapterModel.deleteOne({ _id: id })
+    // Nếu không cập nhật views, update bình thường
+    return await this.chapterModel.updateOne(
+      { _id: updateChapterDto._id },
+      updateData
+    )
+  }
+
+  async remove(id: string, bookId?: string) {
+    // Xóa chương
+    const result = await this.chapterModel.findByIdAndDelete(id)
+
+    // Nếu có bookId, cập nhật lại book để xóa chương khỏi mảng chapters
+    if (bookId) {
+      await this.bookModel.findByIdAndUpdate(bookId, {
+        $pull: { chapters: id },
+      })
+    }
+
+    return result
   }
 }

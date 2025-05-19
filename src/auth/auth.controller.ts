@@ -22,12 +22,17 @@ import { JwtAuthGuard } from '@/auth/passport/jwt-auth.guard'
 import { Public } from '@/decorator/customize'
 import { MailerService } from '@nestjs-modules/mailer'
 import { Request as ExpressRequest, Response } from 'express'
+import { Model } from 'mongoose'
+import { User } from '@/modules/users/schemas/user.schema'
+import { InjectModel } from '@nestjs/mongoose'
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly mailerService: MailerService
+    private readonly mailerService: MailerService,
+    @InjectModel(User.name)
+    private userModel: Model<User>
   ) {}
 
   @Post('login')
@@ -39,10 +44,8 @@ export class AuthController {
 
   // @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    return {
-      user: req.user,
-    }
+  async getProfile(@Request() req) {
+    return this.authService.getProfile(req.user)
   }
 
   @Post('register')

@@ -1,4 +1,5 @@
 import { Book } from '@/modules/books/schemas/book.schema'
+import { Chapter } from '@/modules/chapters/schemas/chapter.schema'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose, { HydratedDocument } from 'mongoose'
 
@@ -41,6 +42,9 @@ export class User {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }] })
   books: Book[]
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }] })
+  chapters: Chapter[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

@@ -5,4 +5,6 @@ export interface IUser {
   role: string
   coin: number
   avatar: string
+  books?: string[]
+  chapters?: string[]
 }

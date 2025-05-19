@@ -9,6 +9,9 @@ export class Category {
   @Prop()
   categoryName: string
 
+  @Prop()
+  description: string
+
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }] })
   books: Book[]
 }

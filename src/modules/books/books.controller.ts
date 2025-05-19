@@ -27,6 +27,7 @@ export class BooksController {
     if (!groupId) {
       throw new BadRequestException('groupId is required')
     }
+    createBookDto.translatorGroup = groupId
 
     // Tạo sách mới
     const book = await this.booksService.create(createBookDto)
@@ -42,15 +43,27 @@ export class BooksController {
   findAll(
     @Query() query: string,
     @Query('current') current: string,
-    @Query('pageSize') pageSize: string
+    @Query('pageSize') pageSize: string,
+    @Query('limit') limit: string,
+    @Query('categoryId') categoryId: string,
+    @Query('status') status: string,
+    @Query('period') period: 'day' | 'week' | 'month' | 'all' = 'day'
   ) {
-    return this.booksService.findAll(query, +current, +pageSize)
+    return this.booksService.findAll(
+      query,
+      +current,
+      +pageSize,
+      limit,
+      categoryId,
+      status,
+      period
+    )
   }
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.booksService.findOne(id)
+  findOne(@Param('id') id: string, @Query('limit') limit: string) {
+    return this.booksService.findOne(id, limit)
   }
 
   @Public()
@@ -63,5 +76,19 @@ export class BooksController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.booksService.remove(id)
+  }
+
+  @Post('many')
+  async getBooksByIdsPost(@Body('ids') ids: string[]) {
+    return this.booksService.findManyByIds(ids)
+  }
+
+  @Public()
+  @Post('top')
+  async getTopBooks(
+    @Query('period') period: 'day' | 'week' | 'month' | 'all' = 'day',
+    @Query('limit') limit: number = 10
+  ) {
+    return this.booksService.getTopBooksByViews(period, Number(limit))
   }
 }

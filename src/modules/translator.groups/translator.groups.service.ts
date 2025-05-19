@@ -92,6 +92,20 @@ export class TranslatorGroupsService {
     })
       .limit(pageSize)
       .skip(skip)
+      .populate({
+        path: 'books',
+        select: {
+          _id: 1,
+          bookTitle: 1,
+          bookStatus: 1,
+          description: 1,
+          imgUrl: 1,
+          author: 1,
+          categories: 1,
+          group: 1,
+          status: 1,
+        },
+      })
 
     const res = {
       meta: {

@@ -19,6 +19,8 @@ import { join } from 'path'
 import { CategoriesModule } from '@/modules/categories/categories.module'
 import { CommentsModule } from './modules/comments/comments.module'
 import { OtpsModule } from './modules/otps/otps.module'
+import { ReadingHistoryModule } from './modules/reading-history/reading-history.module'
+
 @Module({
   imports: [
     UsersModule,
@@ -27,6 +29,7 @@ import { OtpsModule } from './modules/otps/otps.module'
     CategoriesModule,
     ChaptersModule,
     TranslatorGroupsModule,
+    ReadingHistoryModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -67,6 +70,7 @@ import { OtpsModule } from './modules/otps/otps.module'
       }),
       inject: [ConfigService],
     }),
+    ReadingHistoryModule,
   ],
   controllers: [AppController],
   providers: [

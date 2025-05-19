@@ -60,8 +60,24 @@ export class UsersController {
     }
   }
 
-  @Post('change-password')
+  @Post('change-password/:userId')
   changePassword(@Body() body: ChangePasswordUserDto, @Req() req) {
     return this.usersService.changePassword(req.user, body)
+  }
+
+  @Patch('unfollow-book/:userId')
+  async unfollowBook(
+    @Param('userId') userId: string,
+    @Body('bookId') bookId: string
+  ) {
+    return this.usersService.unfollowBook(userId, bookId)
+  }
+
+  @Patch('follow-book/:userId')
+  async followBook(
+    @Param('userId') userId: string,
+    @Body('bookId') bookId: string
+  ) {
+    return this.usersService.followBook(userId, bookId)
   }
 }

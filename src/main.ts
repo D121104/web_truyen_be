@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import { TransformInterceptor } from './core/transform.interceptor'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { join } from 'path'
+import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)

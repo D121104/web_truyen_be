@@ -12,13 +12,18 @@ import { ConfigService } from '@nestjs/config'
 import ms, { StringValue } from 'ms'
 import { Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
+import { User } from '@/modules/users/schemas/user.schema'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    @InjectModel(User.name)
+    private userModel: Model<User>
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
@@ -42,6 +47,17 @@ export class AuthService {
     })
 
     return refreshToken
+  }
+
+  async getProfile(user: IUser) {
+    const userEmail = user.email
+    const userProfile = await this.usersService.findByEmail(userEmail)
+    if (!userProfile) {
+      throw new BadRequestException('User not found')
+    }
+    return {
+      user: userProfile,
+    }
   }
 
   async login(user: any, res: Response) {
@@ -100,6 +116,7 @@ export class AuthService {
         codeId: null,
         codeExpiredAt: null,
         books: [],
+        chapters: [],
       })
     } else {
       const userName = user.firstName + ' ' + user.lastName
@@ -153,6 +170,7 @@ export class AuthService {
       codeId: null,
       codeExpiredAt: null,
       books: [],
+      chapters: [],
       role: 'USER',
     }
     return await this.usersService.handleRegister(userDto)

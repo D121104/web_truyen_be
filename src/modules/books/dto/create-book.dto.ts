@@ -1,3 +1,5 @@
+import { Category } from '@/modules/categories/schemas/category.schema'
+import { TranslatorGroup } from '@/modules/translator.groups/schemas/translator.group.schema'
 import { IsNotEmpty } from 'class-validator'
 
 export class CreateBookDto {
@@ -12,4 +14,13 @@ export class CreateBookDto {
 
   @IsNotEmpty()
   author: string
+
+  @IsNotEmpty()
+  categories: Category[]
+
+  @IsNotEmpty()
+  translatorGroup: string
+
+  @IsNotEmpty()
+  status: string
 }

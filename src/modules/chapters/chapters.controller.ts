@@ -12,16 +12,17 @@ import { ChaptersService } from './chapters.service'
 import { CreateChapterDto } from './dto/create-chapter.dto'
 import { UpdateChapterDto } from './dto/update-chapter.dto'
 import { Public } from '@/decorator/customize'
-import { GetChaptersDetailsDto } from '@/modules/chapters/dto/get-chapter-detail.dto'
 
 @Controller('chapters')
 export class ChaptersController {
   constructor(private readonly chaptersService: ChaptersService) {}
 
-  @Public()
   @Post()
-  create(@Body() createChapterDto: CreateChapterDto) {
-    return this.chaptersService.create(createChapterDto)
+  async create(
+    @Body() createChapterDto: CreateChapterDto,
+    @Query('bookId') bookId: string
+  ) {
+    return this.chaptersService.create(createChapterDto, bookId)
   }
 
   @Public()
@@ -48,7 +49,7 @@ export class ChaptersController {
 
   @Public()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.chaptersService.remove(id)
+  remove(@Param('id') id: string, @Query('bookId') bookId: string) {
+    return this.chaptersService.remove(id, bookId)
   }
 }

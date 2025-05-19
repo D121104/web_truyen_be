@@ -18,7 +18,9 @@ export class CreateUserDto {
   refreshToken: string
   codeId: string
   codeExpiredAt: Date
+
   books: string[]
+  chapters: string[]
 
   @IsOptional()
   role: string
