@@ -19,8 +19,6 @@ import { join } from 'path'
 import { CategoriesModule } from '@/modules/categories/categories.module'
 import { CommentsModule } from './modules/comments/comments.module'
 import { OtpsModule } from './modules/otps/otps.module'
-import { ReadingHistoryModule } from './modules/reading-history/reading-history.module'
-
 @Module({
   imports: [
     UsersModule,
@@ -81,4 +79,4 @@ import { ReadingHistoryModule } from './modules/reading-history/reading-history.
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
