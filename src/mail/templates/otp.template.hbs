@@ -1,27 +1,48 @@
 <html lang='en'>
 
-<head>
-  <meta charset='UTF-8' />
-  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-  <title>Document</title>
-</head>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Lấy lại mật khẩu</title>
+  </head>
 
-<body>
-  <div style='font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2'>
-    <div style='margin:50px auto;width:70%;padding:20px 0'>
-      <div style='border-bottom:1px solid #eee'>
-        <a href='' style='font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600'>Lấy lại mật khẩu</a>
+  <body>
+    <div
+      style="font-family: 'Segoe UI', Arial, sans-serif; min-width: 400px; background: #f6f9fb; padding: 0; margin: 0;"
+    >
+      <div
+        style='max-width: 480px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); padding: 36px 32px;'
+      >
+        <div
+          style='border-bottom: 2px solid #00466a; padding-bottom: 18px; margin-bottom: 28px; text-align: center;'
+        >
+          <span
+            style='font-size: 1.6em; color: #00466a; font-weight: 700; letter-spacing: 1px;'
+          >Bạn vừa gửi yêu cầu lấy lại mật khẩu</span>
+        </div>
+        <p style='font-size: 1.3em; color: #222; margin-bottom: 12px;'>Xin Chào!</p>
+        <p style='font-size: 1.1em; color: #444; margin-bottom: 10px;'>
+          Vui lòng nhấn vào nút dưới đây.
+        </p>
+        <p style='font-size: 1.1em; color: #444; margin-bottom: 24px;'>
+          Thời gian thay đổi mật khẩu của bạn là
+          <span style='color: #e67e22; font-weight: 600;'>10 phút</span>.
+        </p>
+        <div style='text-align: center; margin-bottom: 32px;'>
+          <a
+            href='{{linkVerify}}'
+            style='background: linear-gradient(90deg, #00466a 0%, #0077b6 100%); padding: 14px 36px; color: #fff; border-radius: 6px; font-size: 1.2em; text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 2px 8px rgba(0,70,106,0.08); transition: background 0.2s;'
+          >
+            Nhấn vào đây
+          </a>
+        </div>
+        <p style='font-size: 1em; color: #888; text-align: center;'>Trân trọng!<br
+          /></p>
+        <hr
+          style='border: none; border-top: 1px solid #eee; margin: 28px 0 0 0;'
+        />
       </div>
-      <p style='font-size:1.1em'>Xin Chào!</p>
-      <p>Vui lòng nhấn vào link dưới đây để thay đổi mật khẩu của bạn</p>
-      <p>Thời gian thay đổi mật khẩu của bạn là 10 phút</p>
-      <a style='background: #00466a;margin: 0 auto;width: max-content;padding:10px;color: #fff;border-radius: 4px;font-size: 20px;text-decoration: none;'
-        href='{{linkVerify}}'>Nhấn vào đây</a>
-      <p style='font-size:0.9em;'>Trân Trọng!<br /></p>
-      <hr style='border:none;border-top:1px solid #eee' />
-
     </div>
-  </div>
-</body>
+  </body>
 
 </html>
