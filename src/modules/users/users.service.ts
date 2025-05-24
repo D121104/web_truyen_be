@@ -28,7 +28,7 @@ export class UsersService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     private readonly mailerService: MailerService
-  ) { }
+  ) {}
 
   isEmailExist = async (email: string) => {
     const user = await this.userModel.exists({ email })
@@ -52,17 +52,24 @@ export class UsersService {
     })
     return {
       _id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      coin: user.coin,
     }
   }
 
   async addCoin(userId: string, coin: number) {
-    return await this.userModel.updateOne({
-      _id: userId,
-    }, {
-      $inc: {
-        coin: coin,
+    return await this.userModel.updateOne(
+      {
+        _id: userId,
       },
-    })
+      {
+        $inc: {
+          coin: coin,
+        },
+      }
+    )
   }
 
   async updateUserName(email: string, name: string) {
