@@ -91,4 +91,17 @@ export class BooksController {
   ) {
     return this.booksService.getTopBooksByViews(period, Number(limit))
   }
+
+  @Post('like/:id')
+  async likeBook(@Param('id') bookId: string, @Body('userId') userId: string) {
+    return this.booksService.likeBook(bookId, userId)
+  }
+
+  @Post('unlike/:id')
+  async unlikeBook(
+    @Param('id') bookId: string,
+    @Body('userId') userId: string
+  ) {
+    return this.booksService.unlikeBook(bookId, userId)
+  }
 }

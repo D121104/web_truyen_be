@@ -10,6 +10,7 @@ import { Book } from './schemas/book.schema'
 import mongoose, { Model } from 'mongoose'
 import aqp from 'api-query-params'
 import { TranslatorGroupsService } from '@/modules/translator.groups/translator.groups.service'
+import { User } from '@/modules/users/schemas/user.schema'
 
 @Injectable()
 export class BooksService {
@@ -17,6 +18,8 @@ export class BooksService {
     @InjectModel(Book.name)
     private bookModel: Model<Book>,
 
+    @InjectModel('User')
+    private readonly userModel: Model<User>,
     private readonly translatorGroupsService: TranslatorGroupsService
   ) {}
 
@@ -496,5 +499,37 @@ export class BooksService {
     })
 
     return result.sort((a, b) => b.totalViews - a.totalViews).slice(0, limit)
+  }
+
+  async likeBook(bookId: string, userId: string) {
+    // Thêm userId vào mảng likes của book (không trùng lặp)
+    const book = await this.bookModel.findOneAndUpdate(
+      { _id: bookId },
+      { $addToSet: { likes: userId } },
+      { new: true }
+    )
+    // Thêm bookId vào mảng likeBooks của user (không trùng lặp)
+    await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      { $addToSet: { likeBooks: bookId } },
+      { new: true }
+    )
+    return { code: 200, message: 'Liked', data: book }
+  }
+
+  async unlikeBook(bookId: string, userId: string) {
+    // Xóa userId khỏi mảng likes của book
+    const book = await this.bookModel.findOneAndUpdate(
+      { _id: bookId },
+      { $pull: { likes: userId } },
+      { new: true }
+    )
+    // Xóa bookId khỏi mảng likeBooks của user
+    await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { likeBooks: bookId } },
+      { new: true }
+    )
+    return { code: 200, message: 'Unliked', data: book }
   }
 }

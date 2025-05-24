@@ -6,6 +6,8 @@ import mongoose, { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import aqp from 'api-query-params'
 import { Book } from '@/modules/books/schemas/book.schema'
+import { BuyChapterDto } from '@/modules/chapters/dto/buy-chapter.dto'
+import { User } from '@/modules/users/schemas/user.schema'
 
 @Injectable()
 export class ChaptersService {
@@ -13,7 +15,9 @@ export class ChaptersService {
     @InjectModel(Chapter.name)
     private chapterModel: Model<Chapter>,
     @InjectModel(Book.name) // <-- Thêm dòng này
-    private readonly bookModel: Model<Book>
+    private readonly bookModel: Model<Book>,
+    @InjectModel(User.name) // <-- Thêm dòng này
+    private readonly userModel: Model<User>
   ) {}
 
   async create(createChapterDto: CreateChapterDto, bookId: string) {
@@ -144,5 +148,43 @@ export class ChaptersService {
     }
 
     return result
+  }
+
+  async buyChapter(BuyChapterDto: BuyChapterDto) {
+    const { userId, chapterId } = BuyChapterDto
+
+    if (!mongoose.Types.ObjectId.isValid(chapterId)) {
+      throw new BadRequestException('Invalid chapter ID')
+    }
+
+    const chapter = await this.chapterModel.findById(chapterId)
+
+    if (!chapter) {
+      throw new BadRequestException('Chapter not found')
+    }
+
+    if (
+      chapter.users &&
+      chapter.users.includes(new mongoose.Types.ObjectId(userId))
+    ) {
+      throw new BadRequestException('You have already bought this chapter')
+    }
+
+    const user = await this.userModel.findById(userId)
+    if (!user) {
+      throw new BadRequestException('User not found')
+    }
+
+    if (!user.coin || user.coin < chapter.price) {
+      throw new BadRequestException('Insufficient balance to buy this chapter')
+    }
+
+    user.coin -= chapter.price
+    await user.save()
+
+    return await this.chapterModel.updateOne(
+      { _id: chapterId },
+      { $addToSet: { users: userId } }
+    )
   }
 }

@@ -18,6 +18,7 @@ import dayjs from 'dayjs'
 import { MailerService } from '@nestjs-modules/mailer'
 import { IUser } from '@/modules/users/users.interface'
 import { OtpsService } from '../otps/otps.service'
+import { Book } from '@/modules/books/schemas/book.schema'
 
 @Injectable()
 export class UsersService {
@@ -27,7 +28,9 @@ export class UsersService {
 
     @InjectModel(User.name)
     private userModel: Model<User>,
-    private readonly mailerService: MailerService
+    private readonly mailerService: MailerService,
+    @InjectModel('Book')
+    private readonly bookModel: Model<Book> // Replace 'any' with your actual Book model type
   ) {}
 
   isEmailExist = async (email: string) => {
@@ -118,7 +121,7 @@ export class UsersService {
     return res
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     //check id
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid ID')
@@ -262,18 +265,34 @@ export class UsersService {
   }
 
   async unfollowBook(userId: string, bookId: string) {
-    return await this.userModel.findByIdAndUpdate(
-      userId,
+    await this.userModel.findOneAndUpdate(
+      { _id: userId },
       { $pull: { books: bookId } },
       { new: true }
     )
+
+    await this.bookModel.findOneAndUpdate(
+      { _id: bookId },
+      { $pull: { users: userId } },
+      { new: true }
+    )
+
+    return await this.userModel.findById(userId)
   }
 
   async followBook(userId: string, bookId: string) {
-    return await this.userModel.findByIdAndUpdate(
-      userId,
-      { $addToSet: { books: bookId } }, // $addToSet để không bị trùng
+    await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      { $addToSet: { books: bookId } },
       { new: true }
     )
+
+    await this.bookModel.findOneAndUpdate(
+      { _id: bookId },
+      { $addToSet: { users: userId } },
+      { new: true }
+    )
+
+    return await this.userModel.findById(userId)
   }
 }

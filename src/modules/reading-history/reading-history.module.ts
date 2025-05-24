@@ -12,12 +12,14 @@ import {
 import { BooksModule } from '@/modules/books/books.module'
 import { TranslatorGroupsModule } from '@/modules/translator.groups/translator.groups.module'
 import { ChaptersModule } from '@/modules/chapters/chapters.module'
+import { UsersModule } from '@/modules/users/users.module'
 
 @Module({
   imports: [
     BooksModule,
     TranslatorGroupsModule,
     ChaptersModule,
+    UsersModule,
     MongooseModule.forFeature([{ name: Book.name, schema: BookSchema }]),
     MongooseModule.forFeature([{ name: Chapter.name, schema: ChapterSchema }]),
   ],

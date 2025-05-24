@@ -12,6 +12,7 @@ import { ChaptersService } from './chapters.service'
 import { CreateChapterDto } from './dto/create-chapter.dto'
 import { UpdateChapterDto } from './dto/update-chapter.dto'
 import { Public } from '@/decorator/customize'
+import { BuyChapterDto } from '@/modules/chapters/dto/buy-chapter.dto'
 
 @Controller('chapters')
 export class ChaptersController {
@@ -51,5 +52,11 @@ export class ChaptersController {
   @Delete(':id')
   remove(@Param('id') id: string, @Query('bookId') bookId: string) {
     return this.chaptersService.remove(id, bookId)
+  }
+
+  @Public()
+  @Post('buy')
+  buyChapter(@Body() BuyChapterDto: BuyChapterDto) {
+    return this.chaptersService.buyChapter(BuyChapterDto)
   }
 }

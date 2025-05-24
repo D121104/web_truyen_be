@@ -41,6 +41,9 @@ export class Book {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TranslatorGroup' })
   translatorGroup: TranslatorGroup
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
+  likes: User[]
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book)
